@@ -32,18 +32,24 @@ public partial class Form1 : Form
     private void ConfigureKeyboardFlow()
     {
         // Tab 이동 순서: 메뉴 그룹 -> 옵션 그룹 -> 주문 버튼 -> 초기화 버튼
+        // 메뉴 (RadioButton)
         radioHamburger.TabIndex = 0;
         radioBulgogi.TabIndex = 1;
         radioChicken.TabIndex = 2;
 
+        // 옵션은 첫 번째만 Tab 이동
         chkPotato.TabIndex = 3;
-        chkCola.TabIndex = 4;
-        chkCheese.TabIndex = 5;
-        chkSauce.TabIndex = 6;
+        chkPotato.TabStop = true;
 
-        btnOrder.TabIndex = 7;
-        btnReset.TabIndex = 8;
+        chkCola.TabStop = false;
+        chkCheese.TabStop = false;
+        chkSauce.TabStop = false;
 
+        // 버튼
+        btnOrder.TabIndex = 4;
+        btnReset.TabIndex = 5;
+
+        // 그룹 자체는 Tab 안 타게
         groupMenu.TabStop = false;
         groupOption.TabStop = false;
         groupOrder.TabStop = false;
