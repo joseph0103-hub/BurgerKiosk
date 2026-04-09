@@ -26,7 +26,8 @@ public partial class Form1 : Form
             radioHamburger.Checked = false;
             radioBulgogi.Checked = false;
             radioChicken.Checked = false;
-            ActiveControl = radioHamburger;
+
+            ActiveControl = btnOrder;   // radioHamburger 금지
         }));
     }
 
@@ -204,7 +205,8 @@ public partial class Form1 : Form
             radioHamburger.Checked = false;
             radioBulgogi.Checked = false;
             radioChicken.Checked = false;
-            ActiveControl = radioHamburger;
+
+            ActiveControl = btnOrder;   // radioHamburger 금지
         }));
     }
 }
