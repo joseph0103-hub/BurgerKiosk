@@ -1,104 +1,121 @@
-namespace BurgerKioskWeek1;
+namespace BurgerKiosk;
 
 public partial class Form1 : Form
 {
-
     public Form1()
     {
         InitializeComponent();
-        WireEvents();
-        DrawMenuLabels();
+        Load += Form1_Load;
+        Shown += Form1_Shown;
     }
 
-    private void WireEvents()
+    private void Form1_Load(object? sender, EventArgs e)
     {
-        btnOrder.Click += (_, _) => OrderItems();
-        btnReset.Click += (_, _) => ResetOrder();
+        ResetScreen();
     }
 
-    private void DrawMenuLabels()
+    private void Form1_Shown(object? sender, EventArgs e)
     {
-        picHam.Controls.Add(CreatePictureLabel("햄버거"));
-        picBulgogi.Controls.Add(CreatePictureLabel("불고기"));
-        picChicken.Controls.Add(CreatePictureLabel("치킨"));
+        // WinForms에서 라디오버튼이 표시 시 자동 선택되는 경우를 방지하기 위한 최종 보정
+        BeginInvoke(new Action(() =>
+        {
+            radioHamburger.Checked = false;
+            radioBulgogi.Checked = false;
+            radioChicken.Checked = false;
+            this.ActiveControl = btnOrder;
+        }));
     }
 
-    private Label CreatePictureLabel(string text)
+    private void ResetScreen()
     {
-        return new Label
-        {
-            Dock = DockStyle.Fill,
-            Text = text,
-            TextAlign = ContentAlignment.MiddleCenter,
-            Font = new Font("맑은 고딕", 9F, FontStyle.Bold),
-            BackColor = Color.Transparent
-        };
-    }
+        radioHamburger.Checked = false;
+        radioBulgogi.Checked = false;
+        radioChicken.Checked = false;
 
-    private void OrderItems()
-    {
-        lstOrder.Items.Clear();
-
-        int totalCost = 0;
-
-        if (rdoHamBurger.Checked)
-        {
-            totalCost += 5000;
-            lstOrder.Items.Add("햄버거 5,000원");
-        }
-        else if (rdoBulgogiBurger.Checked)
-        {
-            totalCost += 4000;
-            lstOrder.Items.Add("불고기버거 4,000원");
-        }
-        else if (rdoChickenBurger.Checked)
-        {
-            totalCost += 3000;
-            lstOrder.Items.Add("치킨버거 3,000원");
-        }
-
-        if (chkPotato.Checked)
-        {
-            totalCost += 3500;
-            lstOrder.Items.Add("감자튀김 3,500원");
-        }
-
-        if (chkCola.Checked)
-        {
-            totalCost += 2500;
-            lstOrder.Items.Add("콜라 2,500원");
-        }
-
-        if (chkCheese.Checked)
-        {
-            totalCost += 1500;
-            lstOrder.Items.Add("치즈 추가 1,500원");
-        }
-
-        if (chkSauce.Checked)
-        {
-            totalCost += 500;
-            lstOrder.Items.Add("소스 추가 500원");
-        }
-
-        lblTotalCost.Text = $"{totalCost:N0}원";
-        lblStatus.Text = string.Empty;
-    }
-
-    private void ResetOrder()
-    {
-        rdoHamBurger.Checked = false;
-        rdoBulgogiBurger.Checked = false;
-        rdoChickenBurger.Checked = false;
         chkPotato.Checked = false;
         chkCola.Checked = false;
         chkCheese.Checked = false;
         chkSauce.Checked = false;
 
-        lstOrder.Items.Clear();
-        lblTotalCost.Text = "0원";
-        lblStatus.Text = string.Empty;
-        rdoHamBurger.Focus();
+        listBoxOrder.Items.Clear();
+        lblTotal.Text = "총 금액 : 0원";
+        lblMessage.Text = "";
     }
 
+    private void btnOrder_Click(object? sender, EventArgs e)
+    {
+        bool isMenuSelected =
+            radioHamburger.Checked ||
+            radioBulgogi.Checked ||
+            radioChicken.Checked;
+
+        // 메뉴를 선택하지 않았으면, 체크박스만 선택한 경우도 동일하게 라벨 경고 표시
+        if (!isMenuSelected)
+        {
+            lblMessage.Text = "메뉴를 선택하세요.";
+            listBoxOrder.Items.Clear();
+            lblTotal.Text = "총 금액 : 0원";
+            return;
+        }
+
+        lblMessage.Text = "";
+        listBoxOrder.Items.Clear();
+
+        int total = 0;
+
+        if (radioHamburger.Checked)
+        {
+            listBoxOrder.Items.Add("햄버거 5,000원");
+            total += 5000;
+        }
+        else if (radioBulgogi.Checked)
+        {
+            listBoxOrder.Items.Add("불고기버거 4,000원");
+            total += 4000;
+        }
+        else if (radioChicken.Checked)
+        {
+            listBoxOrder.Items.Add("치킨버거 3,000원");
+            total += 3000;
+        }
+
+        if (chkPotato.Checked)
+        {
+            listBoxOrder.Items.Add("감자튀김 3,500원");
+            total += 3500;
+        }
+
+        if (chkCola.Checked)
+        {
+            listBoxOrder.Items.Add("콜라 2,500원");
+            total += 2500;
+        }
+
+        if (chkCheese.Checked)
+        {
+            listBoxOrder.Items.Add("치즈 추가 1,500원");
+            total += 1500;
+        }
+
+        if (chkSauce.Checked)
+        {
+            listBoxOrder.Items.Add("소스 추가 500원");
+            total += 500;
+        }
+
+        lblTotal.Text = "총 금액 : " + total.ToString("N0") + "원";
+    }
+
+    private void btnReset_Click(object? sender, EventArgs e)
+    {
+        ResetScreen();
+
+        BeginInvoke(new Action(() =>
+        {
+            radioHamburger.Checked = false;
+            radioBulgogi.Checked = false;
+            radioChicken.Checked = false;
+            this.ActiveControl = btnOrder;
+        }));
+    }
 }

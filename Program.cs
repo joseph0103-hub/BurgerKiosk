@@ -1,4 +1,4 @@
-namespace BurgerKioskWeek1;
+namespace BurgerKiosk;
 
 internal static class Program
 {
