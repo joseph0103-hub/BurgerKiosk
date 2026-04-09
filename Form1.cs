@@ -16,6 +16,7 @@ public partial class Form1 : Form
     {
         ResetScreen();
         ConfigureKeyboardFlow();
+        WireInstantUpdateEvents();
     }
 
     private void Form1_Shown(object? sender, EventArgs e)
@@ -55,6 +56,23 @@ public partial class Form1 : Form
         groupOrder.TabStop = false;
     }
 
+    private void WireInstantUpdateEvents()
+    {
+        radioHamburger.CheckedChanged += SelectionChanged;
+        radioBulgogi.CheckedChanged += SelectionChanged;
+        radioChicken.CheckedChanged += SelectionChanged;
+
+        chkPotato.CheckedChanged += SelectionChanged;
+        chkCola.CheckedChanged += SelectionChanged;
+        chkCheese.CheckedChanged += SelectionChanged;
+        chkSauce.CheckedChanged += SelectionChanged;
+    }
+
+    private void SelectionChanged(object? sender, EventArgs e)
+    {
+        UpdateOrderView();
+    }
+
     private void Form1_KeyDown(object? sender, KeyEventArgs e)
     {
         if (e.KeyCode == Keys.Enter)
@@ -92,9 +110,32 @@ public partial class Form1 : Form
         return radioHamburger.Checked || radioBulgogi.Checked || radioChicken.Checked;
     }
 
-    private void BuildOrder()
+    private bool IsAnyOptionSelected()
+    {
+        return chkPotato.Checked || chkCola.Checked || chkCheese.Checked || chkSauce.Checked;
+    }
+
+    private void UpdateOrderView()
     {
         listBoxOrder.Items.Clear();
+
+        if (!IsMenuSelected())
+        {
+            lblTotal.Text = "총 금액 : 0원";
+
+            if (IsAnyOptionSelected())
+            {
+                lblMessage.Text = "메뉴를 먼저 선택한 후 옵션을 선택하세요.";
+            }
+            else
+            {
+                lblMessage.Text = "";
+            }
+            return;
+        }
+
+        lblMessage.Text = "";
+
         int total = 0;
 
         if (radioHamburger.Checked)
@@ -151,7 +192,7 @@ public partial class Form1 : Form
         }
 
         lblMessage.Text = "";
-        BuildOrder();
+        UpdateOrderView();
     }
 
     private void btnReset_Click(object? sender, EventArgs e)
