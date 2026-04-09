@@ -7,23 +7,62 @@ public partial class Form1 : Form
         InitializeComponent();
         Load += Form1_Load;
         Shown += Form1_Shown;
+        KeyPreview = true;
+        KeyDown += Form1_KeyDown;
+        AcceptButton = btnOrder;
     }
 
     private void Form1_Load(object? sender, EventArgs e)
     {
         ResetScreen();
+        ConfigureKeyboardFlow();
     }
 
     private void Form1_Shown(object? sender, EventArgs e)
     {
-        // WinForms에서 라디오버튼이 표시 시 자동 선택되는 경우를 방지하기 위한 최종 보정
         BeginInvoke(new Action(() =>
         {
             radioHamburger.Checked = false;
             radioBulgogi.Checked = false;
             radioChicken.Checked = false;
-            this.ActiveControl = btnOrder;
+            ActiveControl = radioHamburger;
         }));
+    }
+
+    private void ConfigureKeyboardFlow()
+    {
+        // Tab 이동 순서: 메뉴 그룹 -> 옵션 그룹 -> 주문 버튼 -> 초기화 버튼
+        radioHamburger.TabIndex = 0;
+        radioBulgogi.TabIndex = 1;
+        radioChicken.TabIndex = 2;
+
+        chkPotato.TabIndex = 3;
+        chkCola.TabIndex = 4;
+        chkCheese.TabIndex = 5;
+        chkSauce.TabIndex = 6;
+
+        btnOrder.TabIndex = 7;
+        btnReset.TabIndex = 8;
+
+        groupMenu.TabStop = false;
+        groupOption.TabStop = false;
+        groupOrder.TabStop = false;
+    }
+
+    private void Form1_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.Enter)
+        {
+            btnOrder.PerformClick();
+            e.Handled = true;
+            e.SuppressKeyPress = true;
+            return;
+        }
+
+        if (e.KeyCode == Keys.Tab && ActiveControl == btnReset && e.Shift == false)
+        {
+            BeginInvoke(new Action(() => radioHamburger.Focus()));
+        }
     }
 
     private void ResetScreen()
@@ -42,25 +81,14 @@ public partial class Form1 : Form
         lblMessage.Text = "";
     }
 
-    private void btnOrder_Click(object? sender, EventArgs e)
+    private bool IsMenuSelected()
     {
-        bool isMenuSelected =
-            radioHamburger.Checked ||
-            radioBulgogi.Checked ||
-            radioChicken.Checked;
+        return radioHamburger.Checked || radioBulgogi.Checked || radioChicken.Checked;
+    }
 
-        // 메뉴를 선택하지 않았으면, 체크박스만 선택한 경우도 동일하게 라벨 경고 표시
-        if (!isMenuSelected)
-        {
-            lblMessage.Text = "메뉴를 선택하세요.";
-            listBoxOrder.Items.Clear();
-            lblTotal.Text = "총 금액 : 0원";
-            return;
-        }
-
-        lblMessage.Text = "";
+    private void BuildOrder()
+    {
         listBoxOrder.Items.Clear();
-
         int total = 0;
 
         if (radioHamburger.Checked)
@@ -106,6 +134,20 @@ public partial class Form1 : Form
         lblTotal.Text = "총 금액 : " + total.ToString("N0") + "원";
     }
 
+    private void btnOrder_Click(object? sender, EventArgs e)
+    {
+        if (!IsMenuSelected())
+        {
+            lblMessage.Text = "메뉴를 먼저 선택한 후 옵션을 선택하세요.";
+            listBoxOrder.Items.Clear();
+            lblTotal.Text = "총 금액 : 0원";
+            return;
+        }
+
+        lblMessage.Text = "";
+        BuildOrder();
+    }
+
     private void btnReset_Click(object? sender, EventArgs e)
     {
         ResetScreen();
@@ -115,7 +157,7 @@ public partial class Form1 : Form
             radioHamburger.Checked = false;
             radioBulgogi.Checked = false;
             radioChicken.Checked = false;
-            this.ActiveControl = btnOrder;
+            ActiveControl = radioHamburger;
         }));
     }
 }
